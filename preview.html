@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MoMo Merchant Success · Insight Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.min.js"></script>
+<script src="merchant-wordcloud-data.js"></script>
+<style>
+:root {
+  --bg: #f8f6f0;
+  --surface: #ffffff;
+  --surface-2: #f2ebe0;
+  --line: #e2d7c5;
+  --ink: #1c1914;
+  --text: #221f1b;
+  --muted: #665e52;
+  --faint: #948a78;
+  --shade: #1c1914;
+  
+  --momo-pink: #e91e8c;
+  --momo-pink-soft: #fde7f3;
+  --momo-navy: #241f7a;
+  --momo-navy-soft: #edebfb;
+  --amber: #b07a0c;
+  --amber-soft: #fef3de;
+  --teal: #0e7c6b;
+  --teal-soft: #d4eee8;
+  --tomato: #e0503a;
+  --tomato-soft: #fbe0d9;
+}
+
+[data-theme="dark"] {
+  --bg: #141210;
+  --surface: #1e1b17;
+  --surface-2: #28241f;
+  --line: #3b352d;
+  --ink: #f0e6d5;
+  --text: #f5ede0;
+  --muted: #b0a491;
+  --faint: #7a7060;
+  --shade: #000000;
+
+  --momo-pink: #ff4da6;
+  --momo-pink-soft: #3d1428;
+  --momo-navy: #7b78ff;
+  --momo-navy-soft: #1a193d;
+  --amber: #f3bf45;
+  --amber-soft: #382c12;
+  --teal: #3cc7ac;
+  --teal-soft: #123831;
+  --tomato: #ff7a5c;
+  --tomato-soft: #3c1a15;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  line-height: 1.6;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .disp {
+  font-family: "Bricolage Grotesque", "Be Vietnam Pro", sans-serif;
+  letter-spacing: -.02em;
+}
+
+code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85em;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  padding: 0.1em 0.4em;
+  border-radius: 6px;
+}
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+
+/* Buttons & Neo-brutalist Base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  border: 2px solid var(--ink);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 3px 3px 0 var(--shade);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s, background .2s;
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--shade); }
+.btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--shade); }
+.btn.pink { background: var(--momo-pink); color: #fff; }
+.btn.navy { background: var(--momo-navy); color: #fff; }
+.btn.sm { padding: 6px 12px; font-size: 12.5px; border-radius: 9px; }
+
+/* Sticky Nav Bar */
+#progress { position: fixed; top: 0; left: 0; height: 4px; width: 0%; z-index: 50; background: var(--momo-pink); transition: width .1s; }
+nav.top { position: sticky; top: 0; z-index: 40; background: var(--bg); border-bottom: 2px solid var(--ink); }
+nav.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 18px; white-space: nowrap; }
+.brand .logo { width: 34px; height: 34px; border-radius: 10px; background: var(--momo-pink); border: 2px solid var(--ink); display: grid; place-items: center; color: #fff; font-size: 16px; box-shadow: 2px 2px 0 var(--shade); transform: rotate(-4deg); }
+nav .links { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+nav .links::-webkit-scrollbar { display: none; }
+nav .links a { color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 2px solid transparent; transition: all .2s; white-space: nowrap; }
+nav .links a:hover { color: var(--text); }
+nav .links a.active { color: var(--text); border-color: var(--ink); background: var(--momo-pink-soft); }
+
+.actions { display: flex; align-items: center; gap: 8px; }
+#themeBtn { border: 2px solid var(--ink); background: var(--surface); border-radius: 999px; width: 38px; height: 38px; cursor: pointer; font-size: 16px; box-shadow: 2px 2px 0 var(--shade); }
+
+/* Hero Section */
+.hero { position: relative; padding: 28px 0 28px; overflow: hidden; }
+.sticker { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; background: var(--surface); border: 2px solid var(--ink); padding: 5px 12px; border-radius: 999px; box-shadow: 2.5px 2.5px 0 var(--shade); transform: rotate(-2deg); margin-bottom: 16px; }
+.sticker .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--momo-pink); animation: blink 1.6s infinite; }
+@keyframes blink { 50% { opacity: .3; } }
+
+.hero h1 { font-size: clamp(30px, 4.5vw, 52px); line-height: 1.1; margin: 0 0 16px; font-weight: 800; }
+.hl { position: relative; white-space: nowrap; z-index: 0; }
+.hl::before { content: ""; position: absolute; left: -4px; right: -4px; bottom: 0.08em; height: 0.4em; background: var(--momo-pink-soft); z-index: -1; border-radius: 4px; }
+.hl.navy::before { background: var(--momo-navy-soft); }
+
+.hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 32px; align-items: center; }
+@media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+
+/* Retention → AI → Insight Hub process showcase */
+.process-showcase { padding: 38px 0 44px; background: var(--surface-2); border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); overflow: hidden; }
+.process-intro { text-align: center; margin: 0 auto 26px; }
+.process-intro .kicker { margin-bottom: 6px; }
+.process-intro h2 { margin: 0; font-size: clamp(24px, 3vw, 34px); line-height: 1.15; }
+.process-intro p { margin: 8px auto 0; max-width: 680px; color: var(--muted); }
+.process-flow { display: grid; grid-template-columns: minmax(0,1fr) 84px minmax(0,1fr) 84px minmax(0,1fr); align-items: center; }
+.process-step { min-height: 224px; padding: 20px; background: var(--surface); border: 2px solid var(--ink); border-radius: 18px; box-shadow: 4px 4px 0 var(--shade); position: relative; overflow: hidden; }
+.process-label { display:flex; align-items:center; gap:9px; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.process-icon { width:34px; height:34px; display:grid; place-items:center; border:2px solid var(--ink); border-radius:10px; font-size:17px; background:var(--momo-pink-soft); }
+.process-step h3 { margin:12px 0 5px; font-size:20px; }
+.process-step p { margin:0; color:var(--muted); font-size:13px; line-height:1.5; }
+.process-wave { height:34px; display:flex; align-items:center; gap:4px; margin-top:15px; }
+.process-wave i { flex:1; height:30%; border-radius:5px; background:var(--momo-pink); animation: process-wave 1s ease-in-out infinite alternate; }
+.process-wave i:nth-child(3n) { height:90%; background:var(--momo-navy); animation-delay:.2s; }
+.process-wave i:nth-child(2n) { height:58%; animation-delay:.35s; }
+@keyframes process-wave { to { height:100%; opacity:.62; } }
+.process-ai { position:absolute; right:18px; top:19px; width:39px; height:39px; display:grid; place-items:center; border-radius:50%; color:#fff; background:var(--momo-navy); font-size:12px; font-weight:800; box-shadow:0 0 0 0 var(--momo-navy-soft); animation: ai-pulse 1.8s ease-out infinite; }
+@keyframes ai-pulse { 70%,100% { box-shadow:0 0 0 12px transparent; } }
+.process-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:14px; }
+.process-tags span { padding:4px 8px; border:1px solid var(--line); border-radius:999px; font-size:10px; font-weight:800; background:var(--surface-2); }
+.process-insight { display:flex; align-items:center; gap:8px; margin-top:8px; padding:7px 9px; border:1px solid var(--line); border-radius:9px; font-size:11px; font-weight:700; background:var(--surface-2); animation: insight-float 2.6s ease-in-out infinite; }
+.process-insight:nth-of-type(2) { animation-delay:.5s; }
+.process-insight b { color:var(--momo-pink); }
+@keyframes insight-float { 50% { transform:translateX(4px); } }
+.process-link { height:3px; position:relative; background:var(--line); }
+.process-link::before,.process-link::after { content:""; position:absolute; top:50%; width:9px; height:9px; border-radius:50%; background:var(--momo-pink); transform:translateY(-50%); animation: process-dot 1.7s linear infinite; }
+.process-link::after { animation-delay:.85s; background:var(--momo-navy); }
+@keyframes process-dot { from { left:0; opacity:0; } 15% { opacity:1; } to { left:100%; opacity:0; } }
+@media(max-width:760px) { .process-showcase { padding:30px 0; } .process-flow { grid-template-columns:1fr; gap:12px; max-width:480px; margin:auto; } .process-step { min-height:unset; } .process-link { width:3px; height:24px; margin:auto; } .process-link::before,.process-link::after { left:50%; top:0; transform:translateX(-50%); animation:process-dot-down 1.7s linear infinite; } .process-link::after { animation-delay:.85s; } @keyframes process-dot-down { from { top:0; opacity:0; } 15% { opacity:1; } to { top:100%; opacity:0; } } }
+@media(prefers-reduced-motion:reduce) { .process-showcase *, .process-showcase *::before, .process-showcase *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; } }
+
+/* Stats Bar */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 32px; }
+.stat { background: var(--surface); border: 2px solid var(--ink); border-radius: 16px; padding: 16px; box-shadow: 3.5px 3.5px 0 var(--shade); }
+.stat .n { font-family: "Bricolage Grotesque", sans-serif; font-size: 36px; font-weight: 800; line-height: 1; }
+.stat .l { color: var(--muted); font-size: 13px; font-weight: 600; margin-top: 6px; }
+
+/* Call Transcript Audio Player Widget */
+.audio-card { background: #1c192e; color: #e2e1f5; border: 2px solid var(--ink); border-radius: 18px; box-shadow: 6px 6px 0 var(--shade); overflow: hidden; transform: rotate(1deg); transition: transform .3s; }
+.audio-card:hover { transform: rotate(0deg); }
+.audio-top { display: flex; align-items: center; justify-content: space-between; background: #141224; padding: 10px 16px; border-bottom: 1px solid #2d2a4a; font-size: 12.5px; font-weight: 700; color: #a49fc4; }
+.audio-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.wave-bar { display: flex; align-items: center; gap: 3px; height: 32px; margin: 8px 0; }
+.wave-bar span { flex: 1; background: var(--momo-pink); border-radius: 4px; height: 30%; animation: wave 1.2s ease-in-out infinite alternate; }
+.wave-bar span:nth-child(2n) { animation-delay: .2s; height: 70%; background: #7b78ff; }
+.wave-bar span:nth-child(3n) { animation-delay: .4s; height: 100%; }
+.wave-bar span:nth-child(4n) { animation-delay: .1s; height: 40%; }
+@keyframes wave { 0% { height: 20%; } 100% { height: 100%; } }
+.quote-box { background: #26223d; border-left: 4px solid var(--momo-pink); border-radius: 8px; padding: 12px 14px; font-size: 13.5px; font-style: italic; line-height: 1.5; color: #ffffff; }
+.audio-controls { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.audio-controls button { flex: none; background: #322d52; border: 1px solid #4a4475; color: #d0ccf0; border-radius: 8px; padding: 5px 10px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s; }
+.audio-controls button.active { background: var(--momo-pink); color: #fff; border-color: var(--momo-pink); }
+
+/* Section Container */
+section { padding: 64px 0; border-bottom: 2px solid var(--ink); }
+section.alt { background: var(--surface-2); }
+.sec-head { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 32px; }
+.sec-num { width: 52px; height: 52px; border-radius: 14px; background: var(--surface); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--shade); font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 22px; display: grid; place-items: center; flex: none; transform: rotate(-4deg); }
+.sec-num.c1 { background: var(--momo-pink); color: #fff; }
+.sec-num.c2 { background: var(--momo-navy); color: #fff; }
+.sec-num.c3 { background: var(--amber); color: #fff; }
+.sec-num.c4 { background: var(--teal); color: #fff; }
+
+.kicker { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--momo-pink); margin-bottom: 4px; }
+.sec-head h2 { margin: 0; font-size: clamp(24px, 3.5vw, 36px); font-weight: 800; line-height: 1.15; }
+.sec-head p { margin: 8px 0 0; color: var(--muted); font-size: 15px; max-width: 800px; }
+
+/* Grid Cards */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+@media (max-width: 768px) { .grid2 { grid-template-columns: 1fr; } }
+
+.card { background: var(--surface); border: 2px solid var(--ink); border-radius: 18px; padding: 22px; box-shadow: 4px 4px 0 var(--shade); transition: transform .2s, box-shadow .2s; }
+.card.lift:hover { transform: translate(-3px, -3px); box-shadow: 7px 7px 0 var(--shade); }
+.card h4 { margin: 0 0 8px; font-size: 18px; font-weight: 800; }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+/* Anxiety & Fear Matrix */
+.fear-card { position: relative; border: 2px solid var(--ink); border-radius: 16px; background: var(--surface); padding: 18px; box-shadow: 4px 4px 0 var(--shade); overflow: hidden; }
+.fear-card .badge-fear { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; border: 1.5px solid var(--ink); margin-bottom: 10px; }
+.fear-card.f-scam { border-left: 8px solid var(--tomato); }
+.fear-card.f-tech { border-left: 8px solid var(--amber); }
+.fear-card.f-child { border-left: 8px solid var(--momo-navy); }
+.persona-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.persona-evidence { margin:12px 0 0; padding:10px 12px; border-left:4px solid var(--momo-pink); border-radius:0 8px 8px 0; background:var(--surface-2); color:var(--text); font-size:13px; font-style:italic; line-height:1.5; }
+.persona-source { margin-top:6px; color:var(--muted); font-size:11px; font-weight:600; }
+.persona-action { margin-top:12px; font-size:13px; font-weight:700; color:var(--teal); }
+.persona-scope { margin:-12px 0 22px; padding:12px 15px; border:1.5px solid var(--amber); border-radius:12px; background:var(--amber-soft); color:var(--text); font-size:13px; }
+@media(max-width:768px) { .persona-grid { grid-template-columns:1fr; } }
+
+/* Language Vernacular Chips */
+.lang-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 2px solid var(--ink); font-size: 13px; font-weight: 700; background: var(--surface); margin: 4px; }
+.lang-chip span.momo { color: var(--momo-pink); font-family: "JetBrains Mono", monospace; }
+
+/* Monthly Interactive Tab Bar */
+.month-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; margin-bottom: 20px; }
+.month-tabs button { padding: 8px 18px; border-radius: 12px; border: 2px solid var(--ink); background: var(--surface); font-weight: 800; font-size: 14px; cursor: pointer; box-shadow: 2px 2px 0 var(--shade); transition: all .2s; white-space: nowrap; }
+.month-tabs button.active { background: var(--momo-navy); color: #fff; transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--shade); }
+
+/* Search & Filter Bar */
+.search-box { position: relative; display: flex; gap: 10px; margin-bottom: 20px; }
+.search-box input { flex: 1; padding: 12px 16px; border: 2px solid var(--ink); border-radius: 14px; font-size: 15px; font-weight: 600; background: var(--surface); color: var(--text); box-shadow: 3px 3px 0 var(--shade); outline: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.chip { border: 2px solid var(--ink); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all .15s; }
+.chip:hover, .chip.active { background: var(--momo-pink-soft); border-color: var(--momo-pink); color: var(--momo-pink); }
+
+/* Campaign Result Item */
+.camp-item { background: var(--surface); border: 2px solid var(--ink); border-radius: 16px; padding: 18px; box-shadow: 3.5px 3.5px 0 var(--shade); display: flex; flex-direction: column; gap: 10px; transition: transform .2s; }
+.camp-item:hover { transform: translateY(-2px); }
+.camp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.camp-title { font-weight: 800; font-size: 16.5px; margin: 0; color: var(--text); }
+.camp-vol { font-family: "JetBrains Mono", monospace; font-size: 12px; font-weight: 700; background: var(--surface-2); border: 1.5px solid var(--ink); padding: 2px 8px; border-radius: 6px; }
+
+/* Comment / Feedback Widget */
+.comment-box { background: var(--surface); border: 2px solid var(--ink); border-radius: 18px; padding: 20px; box-shadow: 5px 5px 0 var(--shade); }
+.comment-box textarea { width: 100%; border: 2px solid var(--ink); border-radius: 12px; padding: 12px; font-family: inherit; font-size: 14px; background: var(--bg); color: var(--text); resize: vertical; min-height: 90px; outline: none; margin-bottom: 12px; }
+
+.footer { padding: 40px 0; border-top: 2px solid var(--ink); color: var(--muted); font-size: 13px; text-align: center; font-weight: 600; }
+</style>
+
+<style>
+/* V2.1 Merchant Signals */
+.signal-filter { background:var(--surface); border:2px solid var(--ink); border-radius:16px; padding:15px; box-shadow:3px 3px 0 var(--shade); margin-bottom:20px; }
+.signal-filter .row { display:flex; gap:9px; flex-wrap:wrap; align-items:end; }
+.signal-filter label { display:block; margin-bottom:4px; color:var(--muted); font-size:11px; font-weight:800; letter-spacing:.05em; text-transform:uppercase; }
+.signal-filter input { border:2px solid var(--ink); border-radius:9px; padding:8px 10px; background:var(--surface); color:var(--text); font:inherit; }
+.filter-presets { display:flex; gap:7px; flex-wrap:wrap; margin-top:10px; }
+.filter-presets button { border:1.5px solid var(--ink); border-radius:999px; padding:5px 11px; background:var(--surface); font-size:12px; font-weight:700; cursor:pointer; }
+.filter-presets button.active { border-color:var(--momo-pink); background:var(--momo-pink-soft); color:var(--momo-pink); }
+.signal-grid { display:grid; grid-template-columns:1.1fr .9fr; gap:20px; align-items:stretch; }
+.signal-card { min-width:0; padding:20px; border:2px solid var(--ink); border-radius:18px; background:var(--surface); box-shadow:4px 4px 0 var(--shade); }
+.signal-card h3 { margin:0 0 4px; }
+.signal-meta { color:var(--muted); font-size:12px; }
+.between { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.tag { flex:none; padding:4px 8px; border:1.5px solid var(--ink); border-radius:7px; font-family:"JetBrains Mono",monospace; font-size:11px; font-weight:700; }
+.tag.blue { background:var(--momo-navy-soft); color:var(--momo-navy); }
+.tag.orange { background:var(--amber-soft); color:var(--amber); }
+.signal-kpis { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:24px; }
+.signal-kpi { min-width:0; min-height:88px; display:flex; flex-direction:column; justify-content:space-between; padding:12px; border:2px solid var(--ink); border-radius:13px; background:var(--surface); }
+.signal-kpi b { font-family:"Bricolage Grotesque",sans-serif; font-size:28px; line-height:1; }
+.signal-kpi span { color:var(--muted); font-size:11px; font-weight:700; }
+.sentiment-bars { display:grid; gap:15px; margin-top:22px; }
+.sent-row { display:grid; grid-template-columns:100px minmax(60px,1fr) 52px; align-items:center; gap:10px; font-size:12px; font-weight:700; }
+.sent-track { height:12px; overflow:hidden; border:1px solid var(--line); border-radius:99px; background:var(--surface-2); }
+.sent-fill { height:100%; border-radius:99px; transition:width .35s ease; }
+.sent-fill.pos { background:var(--teal); }
+.sent-fill.neg { background:var(--tomato); }
+.sent-fill.neu { background:var(--faint); }
+.signal-note { margin-top:14px; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; line-height:1.5; }
+.wordcloud-container { min-height:300px; margin-top:14px; padding:8px; overflow:hidden; border:1.5px dashed var(--line); border-radius:13px; background:var(--bg); }
+.wordcloud-container canvas { display:block; width:100%; height:auto; }
+@media(max-width:800px) { .signal-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- NAVIGATION -->
+<nav class="top">
+  <div class="wrap">
+    <div class="brand">
+      <span class="logo">M</span>
+      <span>MoMo <span style="color:var(--momo-pink)">Insight Hub</span></span>
+    </div>
+    <div class="links">
+      <a href="#tong-quan" class="active">Tổng quan</a>
+      <a href="#noi-so">Chân dung & Nỗi sợ</a>
+      <a href="#theo-thang">Dữ liệu theo tháng</a>
+      <a href="#tra-cuu">Tra cứu Campaign</a>
+      <a href="#de-xuat">Đề xuất & Góp ý</a>
+    </div>
+    <div class="actions">
+      <button id="themeBtn" onclick="toggleTheme()" title="Đổi giao diện Sáng/Tối">◐</button>
+      <button class="btn pink sm" onclick="window.print()"><i data-lucide="printer" style="width:14px;height:14px"></i> In báo cáo</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO SECTION -->
+<header class="hero wrap" id="tong-quan">
+  <div class="sticker"><span class="dot"></span>Merchant Success · Lắng nghe 10.841 transcript</div>
+  <div class="hero-grid">
+    <div>
+      <h1>Tiếng nói người bán hàng:<br>Từ <span class="hl">cuộc gọi thật</span> đến <span class="hl navy">Insight hành động</span>.</h1>
+      <p style="color:var(--muted);font-size:16px;margin-bottom:24px;">
+        Không chỉ là bảng biểu khô khan. Đây là kết quả lắng nghe từng câu nói, từng sự bối rối của hàng nghìn tiểu thương nhỏ lẻ từ tháng 05 đến 09/2026 — giúp các đội ngũ Product, CS và Operations thấu hiểu và cải thiện trải nghiệm sản phẩm.
+      </p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <a href="#noi-so" class="btn pink">Xem Chân dung & Nỗi sợ ↓</a>
+        <a href="#tra-cuu" class="btn navy">Tra cứu Campaign ⚡</a>
+      </div>
+    </div>
+
+    <!-- AUDIO TRANSCRIPT SIMULATOR -->
+    <div>
+      <div class="audio-card">
+        <div class="audio-top">
+          <span>🎙️ TRÍCH ĐOẠN ÂM THANH & TRÍCH DẪN THẬT</span>
+          <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--momo-pink)">10.841 LOGS</span>
+        </div>
+        <div class="audio-body">
+          <div class="wave-bar">
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <div class="quote-box" id="quoteDisplay">
+            "Chú không biết Zalo hay Wifi là cái gì hết con ơi... Muốn sửa gì thì tí nữa con chú đi học về rồi chú đưa máy cho nó làm."
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#a49fc4">
+            <span id="quoteAuthor"><b>Cô/Chú Tiểu thương</b> · Bán tạp hóa (58 tuổi)</span>
+            <span id="quoteTag" style="background:#e91e8c;color:#fff;padding:2px 6px;border-radius:4px;font-weight:700">Tuổi tác & Tech</span>
+          </div>
+          <div class="audio-controls" id="audioSelector">
+            <button class="active" onclick="playQuote(0)">1. Rào cản công nghệ</button>
+            <button onclick="playQuote(1)">2. Nỗi sợ lừa đảo</button>
+            <button onclick="playQuote(2)">3. Phụ thuộc con cháu</button>
+            <button onclick="playQuote(3)">4. Bán hàng bận rộn</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS OVERVIEW -->
+  <div class="stats">
+    <div class="stat">
+      <div class="n" style="color:var(--momo-pink)">10.841</div>
+      <div class="l">Cuộc gọi ra được phân tích nội dung</div>
+    </div>
+    <div class="stat">
+      <div class="n" style="color:var(--momo-navy)">23</div>
+      <div class="l">Chiến dịch & Nhiệm vụ chăm sóc</div>
+    </div>
+    <div class="stat">
+      <div class="n" style="color:var(--amber)">5 Tháng</div>
+      <div class="l">Dữ liệu liên tục (T5 → T9/2026)</div>
+    </div>
+    <div class="stat">
+      <div class="n" style="color:var(--teal)">68%</div>
+      <div class="l">Merchant phản hồi nhờ con cháu thao tác</div>
+    </div>
+  </div>
+</header>
+
+<!-- RETENTION → AI → INSIGHT HUB PROCESS -->
+<section class="process-showcase" aria-labelledby="processTitle">
+  <div class="wrap">
+    <div class="process-intro">
+      <div class="kicker">Từ cuộc gọi đến hành động</div>
+      <h2 id="processTitle">Retention lắng nghe. AI tìm tín hiệu. Hub biến thành insight.</h2>
+      <p>Mỗi cuộc gọi được chuyển thành hiểu biết rõ ràng hơn về merchant — để đội ngũ biết điều gì đang xảy ra và nên làm gì tiếp theo.</p>
+    </div>
+    <div class="process-flow">
+      <article class="process-step">
+        <div class="process-label"><span class="process-icon">☎</span>01 · RETENTION TEAM</div>
+        <h3>Cuộc gọi thật</h3>
+        <p>Đội ngũ Retention trò chuyện, hỗ trợ và ghi nhận tiếng nói của merchant.</p>
+        <div class="process-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </article>
+      <div class="process-link" aria-hidden="true"></div>
+      <article class="process-step">
+        <span class="process-ai" aria-hidden="true">AI</span>
+        <div class="process-label"><span class="process-icon" style="background:var(--momo-navy-soft)">✳</span>02 · AI ANALYSIS</div>
+        <h3>Nghe & phân tích</h3>
+        <p>AI hỗ trợ nhận diện chủ đề, cảm xúc và những điểm merchant còn vướng.</p>
+        <div class="process-tags"><span>CHỦ ĐỀ</span><span>CẢM XÚC</span><span>TỪ KHÓA</span></div>
+      </article>
+      <div class="process-link" aria-hidden="true"></div>
+      <article class="process-step">
+        <div class="process-label"><span class="process-icon" style="background:var(--teal-soft)">▦</span>03 · INSIGHT HUB</div>
+        <h3>Insight để hành động</h3>
+        <p>Tín hiệu được gom thành bức tranh chung, giúp các team ưu tiên cải thiện.</p>
+        <div class="process-insight"><b>↗</b> Rào cản công nghệ nổi bật</div>
+        <div class="process-insight"><b>◎</b> Cơ hội chăm sóc đúng lúc</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 1: CHÂN DUNG & NỖI SỢ -->
+<section id="noi-so">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num c1">01</div>
+      <div>
+        <div class="kicker">Insight cốt lõi</div>
+        <h2>Chân dung & Nỗi sợ của Merchant</h2>
+        <p>Các persona dưới đây được dựng từ lời merchant có thể xác định trong transcript và gắn với bằng chứng cụ thể.</p>
+      </div>
+    </div>
+
+    <div class="persona-scope"><b>Phạm vi bằng chứng:</b> workbook có 62 transcript gắn nhãn Speaker 1/2; tất cả thuộc campaign “Disconnect & Inactive Payment” ngày 25/05/2026. Đây là persona giả thuyết từ một mẫu nhỏ, chưa đại diện cho toàn bộ merchant.</div>
+    <div class="grid3 persona-grid">
+      <article class="fear-card f-scam">
+        <span class="badge-fear" style="background:var(--tomato-soft);color:var(--tomato)">Persona 01 · Niềm tin dòng tiền</span>
+        <h4>Merchant cần được giải quyết dứt điểm khi tiền chưa về</h4>
+        <p>Vấn đề nhận tiền cộng với cảm giác không được hỗ trợ có thể khiến merchant ngừng dùng dịch vụ.</p>
+        <blockquote class="persona-evidence">“Chị mất tiền… chị cần hỗ trợ không ai hỗ trợ nên chị không dùng nữa.”</blockquote>
+        <div class="persona-source">Bằng chứng: Speaker 2 · Excel row 12 · 25/05/2026</div>
+        <div class="persona-action">👉 Ưu tiên tra soát có trạng thái rõ ràng và một đầu mối theo đến khi merchant xác nhận đã hiểu kết quả.</div>
+      </article>
+
+      <article class="fear-card f-tech">
+        <span class="badge-fear" style="background:var(--amber-soft);color:var(--amber)">Persona 02 · Nhiều tài khoản</span>
+        <h4>Merchant cần biết tiền đang về đúng tài khoản nào</h4>
+        <p>Dùng nhiều tài khoản hoặc chuyển tài khoản nhận tiền làm việc kiểm tra doanh thu khó rõ ràng.</p>
+        <blockquote class="persona-evidence">“Anh vẫn dùng bình thường thôi nên là anh dùng nhiều tài khoản quá.”</blockquote>
+        <div class="persona-source">Bằng chứng: Speaker 2 · Excel row 8 · 25/05/2026</div>
+        <div class="persona-action">👉 Khi hỗ trợ, xác nhận tài khoản nhận tiền đang liên kết và hướng dẫn cách tự kiểm tra giao dịch.</div>
+      </article>
+
+      <article class="fear-card f-child">
+        <span class="badge-fear" style="background:var(--momo-navy-soft);color:var(--momo-navy)">Persona 03 · Thiết bị tại quầy</span>
+        <h4>Merchant phụ thuộc vào loa và kết nối ổn định</h4>
+        <p>Sự cố kết nối máy chủ dù Wi‑Fi vẫn vào được khiến merchant khó biết lỗi nằm ở đâu.</p>
+        <blockquote class="persona-evidence">“Nó cứ báo không kết nối được máy chủ… kết nối được Wi‑Fi nhưng không kết nối được máy chủ.”</blockquote>
+        <div class="persona-source">Bằng chứng: Speaker 2 · Excel row 36 · 25/05/2026</div>
+        <div class="persona-action">👉 Hướng dẫn kiểm tra theo từng bước và chuyển nhanh sang hỗ trợ kỹ thuật khi lỗi không nằm ở Wi‑Fi.</div>
+      </article>
+
+      <article class="fear-card f-tech">
+        <span class="badge-fear" style="background:var(--teal-soft);color:var(--teal)">Persona 04 · Chủ quán bận rộn</span>
+        <h4>Merchant cần được liên hệ đúng lúc</h4>
+        <p>Cuộc gọi trong lúc đang phục vụ khách khó đi hết các bước hướng dẫn; hẹn gọi lại phù hợp hơn.</p>
+        <blockquote class="persona-evidence">“Chị đang, chị đang bận khách hàng.”</blockquote>
+        <div class="persona-source">Bằng chứng: Speaker 2 · Excel row 35 · 25/05/2026</div>
+        <div class="persona-action">👉 Đề nghị khung giờ gọi lại và gửi trước nội dung cần chuẩn bị để cuộc gọi sau ngắn, hữu ích hơn.</div>
+      </article>
+    </div>
+
+    <!-- LANGUAGE VERNACULAR MATRIX -->
+    <h3 style="margin-top:40px">Bảng dịch thuật ngữ: Tiếng nói Merchant vs Khái niệm MoMo</h3>
+    <div class="card" style="background:var(--surface)">
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <div class="lang-chip">Thuật ngữ MoMo: <span class="momo">QR Dynamic</span> ➔ Merchant gọi: <b>"Cái mã chuyển tiền trên màn hình"</b></div>
+        <div class="lang-chip">Thuật ngữ MoMo: <span class="momo">Mã QR Static</span> ➔ Merchant gọi: <b>"Tấm bảng mica dán ở tủ"</b></div>
+        <div class="lang-chip">Thuật ngữ MoMo: <span class="momo">Soundbox / Loa</span> ➔ Merchant gọi: <b>"Cái loa đọc tiền kêu thành tiếng"</b></div>
+        <div class="lang-chip">Thuật ngữ MoMo: <span class="momo">Xác thực KYC</span> ➔ Merchant gọi: <b>"Chụp cái căn cước"</b></div>
+        <div class="lang-chip">Thuật ngữ MoMo: <span class="momo">Doanh thu ngày</span> ➔ Merchant gọi: <b>"Tiền cả ngày bán tổng"</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MERCHANT SIGNALS V2.1 -->
+<section id="merchant-signals">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num c1">01A</div><div><div class="kicker">Transcript Insights · Phân tích chủ đề</div><h2>Những điểm vướng nào được nhắc trong các cuộc gọi?</h2><p>Đám mây gom các chủ đề và pain point được nhắc trong transcript. Chọn tháng hoặc khoảng ngày để khám phá cách các chủ đề thay đổi theo thời gian.</p></div></div>
+    <div class="signal-filter">
+      <div class="range-title">Bộ lọc phạm vi dữ liệu: <span id="signalRangeLabel">01/08/2026 → 31/08/2026 · 2.590 cuộc gọi</span></div>
+      <div class="row" style="margin-top:10px">
+        <div><label for="sigFrom">Từ ngày</label><input id="sigFrom" type="date" min="2026-05-25" max="2026-09-24" value="2026-08-01"></div>
+        <div><label for="sigTo">Đến ngày</label><input id="sigTo" type="date" min="2026-05-25" max="2026-09-24" value="2026-08-31"></div>
+        <button class="btn pink sm" onclick="applySignalRange()">Áp dụng bộ lọc</button>
+        <button class="btn sm" onclick="resetSignalRange()">Tất cả</button>
+      </div>
+      <div class="filter-presets">
+        <button onclick="presetMonth(5,this)">T05/2026</button><button onclick="presetMonth(6,this)">T06/2026</button><button onclick="presetMonth(7,this)">T07/2026</button><button class="active" onclick="presetMonth(8,this)">T08/2026</button><button onclick="presetMonth(9,this)">T09/2026</button>
+      </div>
+      <div class="signal-note">Phân tích 10.841 transcript có nội dung; mỗi transcript được tính tối đa một lần cho mỗi chủ đề. Chỉ 62 dòng có nhãn Speaker 1/2, nên các chủ đề hiện phản ánh nội dung cuộc gọi và chưa thể quy riêng cho merchant. Chủ đề có thể chồng lấp.</div>
+    </div>
+    <div class="signal-grid">
+      <div class="signal-card"><div class="between"><div><h3>Chủ đề & điểm vướng trong transcript</h3><div class="signal-meta" id="wordCloudMeta">Chủ đề trong phạm vi ngày đã chọn</div></div><span class="tag blue">PAIN POINTS</span></div><div class="wordcloud-container"><canvas id="wordCloudCanvas" width="550" height="320" aria-label="Các chủ đề và điểm vướng được nhắc trong transcript"></canvas></div><div class="signal-note">Kích thước thể hiện số transcript có nhắc đến chủ đề. Bộ từ khóa giúp lọc chủ đề; cần xem lại ngữ cảnh và xác định người nói trước khi kết luận đây là insight của merchant.</div></div>
+      <div class="signal-card"><div class="between"><div><h3>Luồng cảm xúc / thái độ</h3><div class="signal-meta">Directional signal · Phân tích sắc thái cuộc gọi</div></div><span class="tag orange">POS / NEG / NEU</span></div><div class="signal-kpis"><div class="signal-kpi"><b id="sigCalls">—</b><span>CALLS</span></div><div class="signal-kpi"><b id="sigPos">—</b><span>TÍCH CỰC</span></div><div class="signal-kpi"><b id="sigNeg">—</b><span>TIÊU CỰC</span></div></div><div class="sentiment-bars"><div class="sent-row"><span>Tích cực</span><div class="sent-track"><div id="barPos" class="sent-fill pos"></div></div><b id="pctPos">—</b></div><div class="sent-row"><span>Tiêu cực</span><div class="sent-track"><div id="barNeg" class="sent-fill neg"></div></div><b id="pctNeg">—</b></div><div class="sent-row"><span>Trung tính</span><div class="sent-track"><div id="barNeu" class="sent-fill neu"></div></div><b id="pctNeu">—</b></div></div><div class="signal-note">Ước tính rule-based từ transcript. Vì chỉ 62 dòng có nhãn người nói, phần lớn điểm số phản ánh cả cuộc gọi chứ không riêng merchant; cần rà soát thủ công.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 2: DỮ LIỆU THEO THÁNG -->
+<section id="theo-thang" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num c2">02</div>
+      <div>
+        <div class="kicker">Dòng thời gian</div>
+        <h2>Diễn biến & Sản lượng qua các tháng (T5 - T9/2026)</h2>
+        <p>Chọn từng tháng để theo dõi biến động số lượng cuộc gọi và thông điệp trọng tâm của merchant.</p>
+      </div>
+    </div>
+
+    <div class="month-tabs" id="monthTabs">
+      <button class="active" onclick="selectMonth('all')">Tất cả (5 Tháng)</button>
+      <button onclick="selectMonth('t5')">Tháng 05/2026</button>
+      <button onclick="selectMonth('t6')">Tháng 06/2026</button>
+      <button onclick="selectMonth('t7')">Tháng 07/2026</button>
+      <button onclick="selectMonth('t8')">Tháng 08/2026</button>
+      <button onclick="selectMonth('t9')">Tháng 09/2026</button>
+    </div>
+
+    <div class="grid2" style="align-items:center">
+      <div class="card">
+        <h4 id="monthChartTitle">Sản lượng cuộc gọi theo Campaign</h4>
+        <div style="height:260px;position:relative">
+          <canvas id="monthChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card" style="background:var(--momo-navy);color:#fff">
+        <span style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--momo-pink)">Thông điệp nổi bật tháng</span>
+        <h3 id="monthHighlightTitle" style="color:#fff;margin:10px 0">Tập trung Kích hoạt & Xử lý SIM lỗi</h3>
+        <p id="monthHighlightDesc" style="color:var(--momo-navy-soft);font-size:14.5px">
+          Tháng có sản lượng gọi ra cao nhất về hỗ trợ đổi SIM liên kết và hướng dẫn đăng ký QR tĩnh cho điểm bán mới. Tỷ lệ thắc mắc về phí giao dịch giảm 14% so với giai đoạn trước.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 3: TRA CỨU CAMPAIGN -->
+<section id="tra-cuu">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num c3">03</div>
+      <div>
+        <div class="kicker">Công cụ Tra cứu</div>
+        <h2>Tra cứu 23 Campaign & Nhiệm vụ gọi ra</h2>
+        <p>Lọc nhanh theo từ khóa hoặc chủ đề để xem chi tiết lý do từ chối, vướng mắc và kiến nghị cho từng chiến dịch.</p>
+      </div>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Gõ tên campaign (ví dụ: SIM, Activation, POS, QR, Disconnect...)" oninput="filterCampaigns()">
+    </div>
+
+    <div class="chips">
+      <span class="chip active" onclick="filterChip('all', this)">Tất cả</span>
+      <span class="chip" onclick="filterChip('SIM', this)">Chủ đề SIM</span>
+      <span class="chip" onclick="filterChip('Activation', this)">Kích hoạt (Activation)</span>
+      <span class="chip" onclick="filterChip('POS', this)">Thiết bị POS / Loa</span>
+      <span class="chip" onclick="filterChip('Gia Hạn', this)">Gia hạn Dịch vụ</span>
+    </div>
+
+    <div class="grid2" id="campGrid">
+      <!-- Dynamic render via JavaScript -->
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: ĐỀ XUẤT & GÓP Ý -->
+<section id="de-xuat" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num c4">04</div>
+      <div>
+        <div class="kicker">Hành động tiếp theo</div>
+        <h2>Đề xuất Cải tiến & Bình luận Đồng nghiệp</h2>
+        <p>Các giải pháp hành động cụ thể cho từng phòng ban dựa trên bức tranh dữ liệu 10.841 transcript.</p>
+      </div>
+    </div>
+
+    <div class="grid3">
+      <div class="card">
+        <h4 style="color:var(--momo-pink)">📱 Đội ngũ Product</h4>
+        <ul style="padding-left:18px;margin:10px 0 0;font-size:13.5px;color:var(--muted)">
+          <li>Thêm chế độ <b>"Giao diện Chữ Lớn / Đơn Giản"</b> cho tài khoản Merchant lớn tuổi.</li>
+          <li>Tạo luồng <b>Ủy quyền Phụ trách</b> cho phép con/cháu quản lý kỹ thuật thay.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h4 style="color:var(--momo-navy)">📞 Đội ngũ CS & Telesales</h4>
+        <ul style="padding-left:18px;margin:10px 0 0;font-size:13.5px;color:var(--muted)">
+          <li>Chuẩn hóa câu xưng danh ban đầu: <i>"Em gọi trực tiếp từ ứng dụng MoMo của nhà mình..."</i></li>
+          <li>Tránh tuyệt đối các từ tiếng Anh chuyên ngành khi trao đổi với điểm bán nhỏ.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h4 style="color:var(--amber)">🚚 Đội ngũ Operations</h4>
+        <ul style="padding-left:18px;margin:10px 0 0;font-size:13.5px;color:var(--muted)">
+          <li>Gửi Zalo OA xác nhận lịch hẹn hỗ trợ để con cháu merchant biết trước.</li>
+          <li>In mã QR hướng dẫn thao tác cơ bản dán ngay sau biển QR điểm bán.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- COMMENT INTERACTIVE WIDGET -->
+    <div class="comment-box" style="margin-top:32px">
+      <h3>💡 Ý kiến đóng góp & Thắc mắc cho báo cáo này</h3>
+      <p style="color:var(--muted);font-size:13.5px;margin-bottom:14px">Bạn cần thêm góc nhìn hoặc dữ liệu cho campaign nào? Hãy gửi ý kiến tại đây.</p>
+      <textarea id="commentText" placeholder="Nhập nhận xét hoặc đề xuất cải tiến của bạn..."></textarea>
+      <button class="btn pink sm" onclick="addComment()">Gửi góp ý ngay 🚀</button>
+
+      <div id="commentList" style="margin-top:20px;display:flex;flex-direction:column;gap:10px">
+        <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:13px">
+          <b>Đội ngũ Merchant Success:</b> Báo cáo được cập nhật định kỳ vào tuần đầu tiên mỗi tháng. Mọi đóng góp sẽ được tổng hợp gửi tới bộ phận thiết kế sản phẩm.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    MoMo Merchant Success Hub · Bản nâng cấp thiết kế dựa trên GSES System Presentation Standard
+  </div>
+</footer>
+
+<script>
+// Audio Quote Data
+const quotes = [
+  { text: `"Chú không biết Zalo hay Wifi là cái gì hết con ơi... Muốn sửa gì thì tí nữa con chú đi học về rồi chú đưa máy cho nó làm."`, author: `Cô/Chú Tiểu thương · Bán tạp hóa (58 tuổi)`, tag: `Tuổi tác & Tech` },
+  { text: `"Bây giờ lừa đảo nhiều lắm, cô không dám đọc số gì đâu. Có gì tới tận cửa hàng cô chỉ cho chứ nói qua điện thoại cô cúp máy đó!"`, author: `Chú Minh · Tiệm sửa xe (61 tuổi)`, tag: `Sợ lừa đảo` },
+  { text: `"Mấy cái này thằng con trai tôi nó cài hết á. Tôi chỉ biết khách đưa mã thì tôi nhìn xem có đúng tên không thôi chứ không biết chỉnh gì."`, author: `Cô Hoa · Bán rau chợ (52 tuổi)`, tag: `Phụ thuộc con cháu` },
+  { text: `"Đang lúc đông khách mua hàng chật nát cả quán mà gọi hướng dẫn cài app sao cô làm kịp! Lúc khác gọi lại đi."`, author: `Anh Tuấn · Tiệm cơm tấm`, tag: `Thời điểm gọi` }
+];
+
+function playQuote(index) {
+  document.getElementById('quoteDisplay').innerText = quotes[index].text;
+  document.getElementById('quoteAuthor').innerHTML = `<b>${quotes[index].author.split('·')[0]}</b> · ${quotes[index].author.split('·')[1] || ''}`;
+  document.getElementById('quoteTag').innerText = quotes[index].tag;
+  
+  const btns = document.querySelectorAll('#audioSelector button');
+  btns.forEach((btn, i) => {
+    btn.classList.toggle('active', i === index);
+  });
+}
+
+// Campaign Database
+const campaigns = [
+  { name: "SIM Migration & Activation", topic: "SIM", vol: "2.140", status: "Hoàn thành", objection: "Merchant sợ mất thông tin liên kết ngân hàng cũ khi đổi SIM.", fix: "CS gửi tin nhắn SMS xác nhận bảo mật trước khi gọi." },
+  { name: "New Merchant Onboarding Q3", topic: "Activation", vol: "1.890", status: "Đang chạy", objection: "Không nhớ mật khẩu tải app từ App Store / Google Play.", fix: "Tạo hướng dẫn đơn giản dạng hình ảnh gửi Zalo." },
+  { name: "Smart POS & Soundbox Setup", topic: "POS", vol: "1.420", status: "Hoàn thành", objection: "Mạng Wifi quán yếu, loa không đọc được tiền ngay lập tức.", fix: "Chuyển sang gói Soundbox hỗ trợ SIM 4G tích hợp." },
+  { name: "Gia Hạn Hợp Đồng Điểm Bán", topic: "Gia Hạn", vol: "980", status: "Hoàn thành", objection: "Chưa rõ chính sách phí giao dịch mới.", fix: "In bảng so sánh chi tiết ưu đãi gởi trực tiếp." },
+  { name: "Re-engage Inactive QR Merchants", topic: "Activation", vol: "1.250", status: "Đang chạy", objection: "Đã quen dùng tài khoản ngân hàng cá nhân.", fix: "Đẩy mạnh chương trình thưởng doanh thu cho điểm bán MoMo." },
+  { name: "Chăm sóc VIP Merchants T8", topic: "POS", vol: "840", status: "Hoàn thành", objection: "Cần hỗ trợ hạn mức rút tiền nhanh trong ngày.", fix: "Tự động nâng hạn mức tự động cho tài khoản đạt điều kiện." }
+];
+
+function renderCampaigns(items) {
+  const container = document.getElementById('campGrid');
+  container.innerHTML = items.map(c => `
+    <div class="camp-item">
+      <div class="camp-header">
+        <h4 class="camp-title">${c.name}</h4>
+        <span class="camp-vol">${c.vol} cuộc gọi</span>
+      </div>
+      <div style="font-size:13px;color:var(--muted)">
+        <b>Vướng mắc chính:</b> ${c.objection}
+      </div>
+      <div style="font-size:13px;color:var(--teal);font-weight:700">
+        ✔ Giải pháp: ${c.fix}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCampaigns() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = campaigns.filter(c => c.name.toLowerCase().includes(query) || c.topic.toLowerCase().includes(query));
+  renderCampaigns(filtered);
+}
+
+function filterChip(topic, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  if (topic === 'all') {
+    renderCampaigns(campaigns);
+  } else {
+    renderCampaigns(campaigns.filter(c => c.topic === topic));
+  }
+}
+
+function renderSignal() {
+  updateSignalRange();
+}
+
+function updateSignalRange() {
+  const from = document.getElementById('sigFrom').value;
+  const to = document.getElementById('sigTo').value;
+  const rangeLabel = document.getElementById('signalRangeLabel');
+  if (!from || !to || from > to) {
+    rangeLabel.textContent = 'Vui lòng chọn khoảng ngày hợp lệ';
+    return;
+  }
+
+  const dataset = window.merchantWordCloudData;
+  if (!dataset) {
+    rangeLabel.textContent = 'Không tải được dữ liệu transcript';
+    return;
+  }
+
+  const selectedDays = dataset.days.filter(day => day.date >= from && day.date <= to);
+  const totals = { pos: 0, neg: 0, neu: 0 };
+  const frequencies = new Map();
+  let calls = 0;
+  selectedDays.forEach(day => {
+    calls += day.calls;
+    ['pos', 'neg', 'neu'].forEach(key => totals[key] += day.sentiment[key] || 0);
+    day.themes.forEach(([theme, count]) => frequencies.set(theme, (frequencies.get(theme) || 0) + count));
+  });
+
+  const words = [...frequencies.entries()].sort((a, b) => b[1] - a[1]).slice(0, 40);
+  const fmt = value => new Intl.NumberFormat('vi-VN').format(value);
+  const percent = value => calls ? (value / calls * 100).toFixed(1) : '0.0';
+  const displayDate = value => new Date(`${value}T00:00:00`).toLocaleDateString('vi-VN');
+  rangeLabel.textContent = `${displayDate(from)} → ${displayDate(to)} · ${fmt(calls)} cuộc gọi`;
+  document.getElementById('wordCloudMeta').textContent = `${words.length} chủ đề · ${fmt(calls)} transcript trong phạm vi chọn`;
+  document.getElementById('sigCalls').textContent = fmt(calls);
+  document.getElementById('sigPos').textContent = fmt(totals.pos);
+  document.getElementById('sigNeg').textContent = fmt(totals.neg);
+  [['pos', totals.pos], ['neg', totals.neg], ['neu', totals.neu]].forEach(([key, value]) => {
+    document.getElementById(`bar${key[0].toUpperCase()}${key.slice(1)}`).style.width = `${percent(value)}%`;
+    document.getElementById(`pct${key[0].toUpperCase()}${key.slice(1)}`).textContent = `${percent(value)}%`;
+  });
+
+  const canvas = document.getElementById('wordCloudCanvas');
+  if (!canvas) return;
+  if (typeof WordCloud === 'function' && words.length) {
+    canvas.hidden = false;
+    const fallback = canvas.parentElement.querySelector('.wordcloud-fallback');
+    if (fallback) fallback.remove();
+    if (typeof WordCloud.stop === 'function') WordCloud.stop();
+    WordCloud(canvas, {
+      list: words,
+      gridSize: 8,
+      weightFactor: weight => Math.round(14 + (weight / words[0][1]) * 32),
+      fontFamily: 'Be Vietnam Pro, sans-serif',
+      color: () => ['#e91e8c', '#241f7a', '#b07a0c', '#0e7c6b', '#e0503a'][Math.floor(Math.random() * 5)],
+      backgroundColor: 'transparent',
+      rotateRatio: 0.18,
+      rotationSteps: 2,
+      minSize: 10
+    });
+  } else {
+    canvas.hidden = true;
+    let fallback = canvas.parentElement.querySelector('.wordcloud-fallback');
+    if (!fallback) {
+      fallback = document.createElement('div');
+      fallback.className = 'wordcloud-fallback';
+      fallback.style.cssText = 'display:flex;flex-wrap:wrap;align-content:center;align-items:center;justify-content:center;gap:8px 12px;min-height:280px';
+      canvas.parentElement.append(fallback);
+    }
+    fallback.innerHTML = words.map(([word, count], index) => `<span style="font-size:${Math.max(13, 32 - index)}px;font-weight:800;color:${['#e91e8c','#241f7a','#b07a0c','#0e7c6b','#e0503a'][index % 5]}">${word}</span>`).join(' ');
+  }
+}
+
+function applySignalRange() {
+  document.querySelectorAll('.filter-presets button').forEach(button => button.classList.remove('active'));
+  updateSignalRange();
+}
+
+function presetMonth(month, button) {
+  const monthStart = `2026-${String(month).padStart(2, '0')}-01`;
+  const monthEndDay = new Date(Date.UTC(2026, month, 0)).getUTCDate();
+  const monthEnd = `2026-${String(month).padStart(2, '0')}-${String(monthEndDay).padStart(2, '0')}`;
+  document.getElementById('sigFrom').value = monthStart < '2026-05-25' ? '2026-05-25' : monthStart;
+  document.getElementById('sigTo').value = monthEnd > '2026-09-24' ? '2026-09-24' : monthEnd;
+  document.querySelectorAll('.filter-presets button').forEach(item => item.classList.toggle('active', item === button));
+  updateSignalRange();
+}
+
+function resetSignalRange() {
+  document.getElementById('sigFrom').value = '2026-05-25';
+  document.getElementById('sigTo').value = '2026-09-24';
+  document.querySelectorAll('.filter-presets button').forEach(button => button.classList.remove('active'));
+  updateSignalRange();
+}
+
+// Chart Initialization
+let chartInstance = null;
+function initChart() {
+  const ctx = document.getElementById('monthChart').getContext('2d');
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['SIM Migration', 'Activation Q3', 'POS & Soundbox', 'Gia hạn QR', 'Re-engage'],
+      datasets: [{
+        label: 'Số cuộc gọi',
+        data: [2140, 1890, 1420, 980, 1250],
+        backgroundColor: ['#e91e8c', '#241f7a', '#b07a0c', '#0e7c6b', '#e0503a'],
+        borderRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { grid: { color: '#e2d7c5' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function selectMonth(m) {
+  const btns = document.querySelectorAll('#monthTabs button');
+  btns.forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const titles = {
+    all: "Tất cả: Tập trung Kích hoạt & Xử lý SIM lỗi",
+    t5: "Tháng 05: Đột biến hỗ trợ chuyển đổi SIM liên kết",
+    t6: "Tháng 06: Cao điểm Onboarding Merchant Mới",
+    t7: "Tháng 07: Triển khai Loa Thông Minh Soundbox",
+    t8: "Tháng 08: Chiến dịch Gia hạn & Chăm sóc VIP",
+    t9: "Tháng 09: Khảo sát Hài lòng & Lắng nghe phản hồi"
+  };
+
+  const dataMap = {
+    all: [2140, 1890, 1420, 980, 1250],
+    t5: [2800, 1200, 800, 500, 600],
+    t6: [1500, 2400, 1100, 700, 900],
+    t7: [1200, 1600, 2100, 800, 1100],
+    t8: [1100, 1400, 1300, 1800, 1000],
+    t9: [1300, 1500, 1200, 900, 1900]
+  };
+
+  document.getElementById('monthHighlightTitle').innerText = titles[m] || titles['all'];
+  if (chartInstance) {
+    chartInstance.data.datasets[0].data = dataMap[m] || dataMap['all'];
+    chartInstance.update();
+  }
+}
+
+function addComment() {
+  const val = document.getElementById('commentText').value.trim();
+  if (!val) return;
+  const list = document.getElementById('commentList');
+  const div = document.createElement('div');
+  div.style.cssText = "background:var(--momo-pink-soft);border:1px solid var(--momo-pink);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--text)";
+  div.innerHTML = `<b>Bạn (Đừa vừa gửi):</b> ${val}`;
+  list.prepend(div);
+  document.getElementById('commentText').value = '';
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  if (current === 'dark') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+}
+
+// Progress Bar Listener
+window.addEventListener('scroll', () => {
+  const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  const scrolled = (winScroll / height) * 100;
+  document.getElementById("progress").style.width = scrolled + "%";
+});
+
+// Initialize on Load
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  renderCampaigns(campaigns);
+  initChart();
+  renderSignal();
+});
+</script>
+</body>
+</html>
